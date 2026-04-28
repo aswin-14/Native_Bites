@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Cookie Demo (Safe)</title>
+</head>
+<body>
+  <button onclick="showCookies()">Click me</button>
+
+  <pre id="output"></pre>
+
+  <script>
+    function showCookies() {
+      // Reads cookies available to this page
+      const cookies = document.cookie;
+
+      // Display locally for learning/debugging
+      document.getElementById("output").textContent =
+        cookies ? cookies : "No accessible cookies (or HttpOnly).";
+    }
+  </script>
+</body>
+</html>
