@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Cookie Demo (Safe)</title>
+  <title>Cookie Demo - Nonce Version</title>
 </head>
 <body>
-  <button onclick="showCookies()">Click me</button>
-
+  <button id="myButton">Click me</button>
   <pre id="output"></pre>
-
-  <script>
-    function showCookies() {
-      // Reads cookies available to this page
+  
+  <!-- Nonce must match the one in CSP header -->
+  <script nonce="YOUR_NONCE_HERE">
+    document.getElementById('myButton').addEventListener('click', () => {
       const cookies = document.cookie;
-
-      // Display locally for learning/debugging
-      document.getElementById("output").textContent =
+      document.getElementById("output").textContent = 
         cookies ? cookies : "No accessible cookies (or HttpOnly).";
-    }
+    });
   </script>
 </body>
 </html>
