@@ -1,19 +1,102 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Cookie Demo - Nonce Version</title>
+  <meta charset="UTF-8">
+  <title>Cloud Password Manager</title>
+  <style>
+    body {
+      font-family: Arial;
+      background: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .box {
+      background: white;
+      padding: 25px;
+      border-radius: 8px;
+      width: 320px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 8px 0;
+    }
+    button {
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #msg {
+      margin-top: 10px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <button id="myButton">Click me</button>
-  <pre id="output"></pre>
-  
-  <!-- Nonce must match the one in CSP header -->
-  <script nonce="YOUR_NONCE_HERE">
-    document.getElementById('myButton').addEventListener('click', () => {
-      const cookies = document.cookie;
-      document.getElementById("output").textContent = 
-        cookies ? cookies : "No accessible cookies (or HttpOnly).";
-    });
-  </script>
+
+<div class="box">
+  <h2>Change Password</h2>
+
+  <input type="password" id="oldPassword" placeholder="Old Password">
+  <input type="password" id="newPassword" placeholder="New Password">
+  <button onclick="changePassword()">Update Password</button>
+
+  <p id="msg"></p>
+</div>
+
+<!-- Firebase SDK -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// 🔥 YOUR FIREBASE CONFIG
+const firebaseConfig = {
+  apiKey: "AIzaSyCLhw0pj4lehIBjns2i5R_xZQYNMDBIAfk",
+  authDomain: "password-cee2b.firebaseapp.com",
+  projectId: "password-cee2b",
+  storageBucket: "password-cee2b.firebasestorage.app",
+  messagingSenderId: "483253955947",
+  appId: "1:483253955947:web:7da483805b30b86096f02e"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// 🔐 Password Function
+window.changePassword = async function () {
+  let oldPass = document.getElementById("oldPassword").value;
+  let newPass = document.getElementById("newPassword").value;
+  let msg = document.getElementById("msg");
+
+  const userRef = doc(db, "users", "user1");
+  const docSnap = await getDoc(userRef);
+
+  // First time setup
+  if (!docSnap.exists()) {
+    await setDoc(userRef, { password: newPass });
+    msg.innerText = "✅ Password set (first time)";
+    msg.style.color = "green";
+    return;
+  }
+
+  let storedPass = docSnap.data().password;
+
+  if (storedPass !== oldPass) {
+    msg.innerText = "❌ Wrong old password";
+    msg.style.color = "red";
+    return;
+  }
+
+  await updateDoc(userRef, { password: newPass });
+
+  msg.innerText = "✅ Password updated successfully";
+  msg.style.color = "green";
+};
+</script>
+
 </body>
 </html>
